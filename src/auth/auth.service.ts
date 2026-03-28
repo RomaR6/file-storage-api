@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -10,6 +11,7 @@ export class AuthService {
 constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>, 
+    private jwtService: JwtService,
 ) {}
 
 
@@ -42,17 +44,19 @@ async login(createAuthDto: CreateAuthDto) {
     if (!user) {
     throw new UnauthorizedException('Невірний email або пароль');
     }
-
+    
     
     const isPasswordMatching = await bcrypt.compare(password, user.password);
 
-    
+    const payload = { sub: user.id, email: user.email };
+
     if (!isPasswordMatching) {
     throw new UnauthorizedException('Невірний email або пароль');
     }
 
     
     return {
+    access_token: await this.jwtService.signAsync(payload),
     message: 'Успішний вхід',
     userId: user.id,
     email: user.email,
