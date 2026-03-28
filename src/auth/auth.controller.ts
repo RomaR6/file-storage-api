@@ -10,7 +10,11 @@ export class AuthController {
   @Post('register') 
   @ApiOperation({ summary: 'Реєстрація нового користувача' }) 
   create(@Body() createAuthDto: CreateAuthDto) {
-    
-    return this.authService.create(createAuthDto);
+  return this.authService.create(createAuthDto);
   }
+  @Post('login')
+  @ApiOperation({ summary: 'Вхід у систему' })
+  login(@Body() createAuthDto: CreateAuthDto) {
+  return this.authService.login(createAuthDto);
+}
 }

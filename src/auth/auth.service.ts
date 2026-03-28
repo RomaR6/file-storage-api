@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -29,5 +29,33 @@ async create(createAuthDto: CreateAuthDto) {
     });
 
     return await this.userRepository.save(user);
+    
 }
+
+async login(createAuthDto: CreateAuthDto) {
+    const { email, password } = createAuthDto;
+
+    
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    
+    if (!user) {
+    throw new UnauthorizedException('Невірний email або пароль');
+    }
+
+    
+    const isPasswordMatching = await bcrypt.compare(password, user.password);
+
+    
+    if (!isPasswordMatching) {
+    throw new UnauthorizedException('Невірний email або пароль');
+    }
+
+    
+    return {
+    message: 'Успішний вхід',
+    userId: user.id,
+    email: user.email,
+    };
+    }
 }
