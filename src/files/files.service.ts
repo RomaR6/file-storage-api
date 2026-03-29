@@ -19,7 +19,17 @@ export class FilesService {
       user: { id: userId },        
     });
 
-    
     return await this.repository.save(newFile);
+  } 
+
+  async findAll(userId: number) {
+    return this.repository.find({
+      where: {
+        user: { id: userId },
+      },
+      order: {
+        createdAt: 'DESC', 
+      },
+    });
   }
 }

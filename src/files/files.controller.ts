@@ -1,6 +1,6 @@
-import { Controller, Post, UseInterceptors, UploadedFile, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, UseInterceptors, UploadedFile, UseGuards, Request } from '@nestjs/common'; // Додав Get
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -12,12 +12,19 @@ import { FilesService } from './files.service';
 @UseGuards(JwtAuthGuard) 
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
+
+  @Get() 
+  @ApiOperation({ summary: 'Отримання списку всіх файлів користувача' })
+  findAll(@Request() req) {
+    return this.filesService.findAll(req.user.userId);
+  }
+
   @Post('upload')
+  @ApiOperation({ summary: 'Завантаження файлу' })
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: './uploads', 
       filename: (req, file, cb) => {
-        
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
       },
