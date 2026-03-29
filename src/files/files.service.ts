@@ -11,13 +11,15 @@ export class FilesService {
     private repository: Repository<FileEntity>, 
   ) {}
 
-  async create(file: Express.Multer.File, userId: number) {
+  async create(file: Express.Multer.File, userId: number, comment?: string, deleteAt?: string) {
     const newFile = this.repository.create({
       filename: file.originalname, 
       path: file.path,             
       mimetype: file.mimetype,     
-      size: file.size,             
-      user: { id: userId },        
+      size: file.size,
+      comment: comment || undefined, 
+      deleteAt: deleteAt ? new Date(deleteAt) : undefined, 
+      user: { id: userId } as any, 
     });
 
     return await this.repository.save(newFile);
@@ -33,19 +35,20 @@ export class FilesService {
       },
     });
   }
+
   async remove(id: number, userId: number) {
-  const file = await this.repository.findOne({
-    where: { id, user: { id: userId } },
-  });
+    const file = await this.repository.findOne({
+      where: { id, user: { id: userId } },
+    });
 
-  if (!file) {
-    throw new NotFoundException('Файл не знайдено');
+    if (!file) {
+      throw new NotFoundException('Файл не знайдено');
+    }
+
+    if (fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+
+    return this.repository.remove(file);
   }
-
-  if (fs.existsSync(file.path)) {
-    fs.unlinkSync(file.path);
-  }
-
-  return this.repository.remove(file);
-}
 }
