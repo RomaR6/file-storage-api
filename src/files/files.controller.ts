@@ -1,4 +1,4 @@
-import { Controller, Post, Get, UseInterceptors, UploadedFile, UseGuards, Request } from '@nestjs/common'; // Додав Get
+import { Controller, Post, Get, UseInterceptors, UploadedFile, UseGuards, Request, Delete, Param } from '@nestjs/common'; 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -45,4 +45,9 @@ export class FilesController {
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Request() req) {
     return this.filesService.create(file, req.user.userId);
   }
+  @Delete(':id')
+  @ApiOperation({ summary: 'Видалення файлу' })
+  remove(@Param('id') id: string, @Request() req) {
+    return this.filesService.remove(+id, req.user.userId);
+}
 }

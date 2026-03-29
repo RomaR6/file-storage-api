@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileEntity } from './entities/file.entity';
+import * as fs from 'fs';
 
 @Injectable()
 export class FilesService {
@@ -32,4 +33,19 @@ export class FilesService {
       },
     });
   }
+  async remove(id: number, userId: number) {
+  const file = await this.repository.findOne({
+    where: { id, user: { id: userId } },
+  });
+
+  if (!file) {
+    throw new NotFoundException('Файл не знайдено');
+  }
+
+  if (fs.existsSync(file.path)) {
+    fs.unlinkSync(file.path);
+  }
+
+  return this.repository.remove(file);
+}
 }
