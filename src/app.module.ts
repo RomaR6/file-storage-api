@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entities/user.entity';
 import { FilesModule } from './files/files.module';
+import { FileEntity } from './files/entities/file.entity';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { FilesModule } from './files/files.module';
       username: 'user',       
       password: 'password',   
       database: 'file_storage_api', 
-      entities: [User],       
+      entities: [User, FileEntity],       
       synchronize: true,      
     }),
     AuthModule,
