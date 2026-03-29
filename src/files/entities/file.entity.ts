@@ -18,6 +18,12 @@ export class FileEntity {
   @Column()
   size: number; 
 
+  @Column({ nullable: true })
+  comment: string;
+
+  @Column({ nullable: true })
+  deleteAt: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
