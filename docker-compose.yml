@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # База даних PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: file_storage_db
@@ -15,8 +14,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Інтерфейс для перегляду бази даних (Adminer)
-  # Буде доступний за адресою http://localhost:8080
   adminer:
     image: adminer
     container_name: file_storage_adminer
